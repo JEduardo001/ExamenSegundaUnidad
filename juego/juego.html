@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-color: #000000;
+        }
+        canvas{
+            background-color: rgb(0, 0, 0);
+        }
+        #gif {
+            position: absolute;
+            top: 0px;
+            left: -150px;
+            z-index: 1;
+            width: 500px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="1700" height="900" style="border:1px solid grey"></canvas>
+    <img id="gif" src="videoplayback.gif" alt="GIF"  >
+
+    <script src="Player.js"></script>
+    <script src="Arma.js"></script>
+    <script src="Particulas.js"></script>
+
+    <script src="Enemigo.js"></script>
+
+
+    <script type="text/javascript">
+        const myCanvas = document.getElementById("myCanvas");
+        const ctx = myCanvas.getContext("2d");
+
+
+         // Crear un nuevo objeto Image para cargar el GIF
+         var gif = new Image();
+         gif.src = "videoplayback.gif"; // URL del GIF
+ 
+         // Dibujar el GIF en el canvas una vez que se carga
+         gif.onload = function() {
+            console.log("cargado")
+             ctx.drawImage(gif, 50, 50, 200, 200); // Dibuja el GIF en (50, 50) y con tamaño 200x200
+         };
+        var jugador = new Player(50,50,50,50,20,7,15,0);  
+        var arma = new Arma(0,0,10,10,3,false); 
+        var enemigos = [];
+        var particulasRestosEnemigos = [];
+        var particulasEscenarioFondo = [];
+        var mouseX 
+        var mouseY 
+
+        
+
+        cargarVariables()
+
+        function cargarVariables(){
+            for (let i = 0; i <20; i++) {
+                enemigos[i] = new Enemigo(genRandom(1650),genRandom(850),30,30,7,3,10,0);  
+                particulasRestosEnemigos[i] = new Particulas(0,0,10,10,10,0,true,0);  
+
+            }
+            for (let i = 0; i <100; i++) {
+                particulasEscenarioFondo[i] = new Particulas(
+                    Math.floor(Math.random()*1700)
+                    ,0,3,3,
+                    Math.floor(Math.random()*5+1)
+                    ,0,true,1);  
+
+            }
+            
+            
+        }
+
+        function genRandom(alcanze){
+            return Math.floor(Math.random()*alcanze);
+        }
+       
+        addEventListener("keydown", (event) => {
+          
+
+            switch(event.keyCode) {
+                case 32:
+                    pausa = !pausa;
+                    break;
+                case 87:
+                   jugador.direccion = 0;
+                    break;
+                case 83:
+                   jugador.direccion = 1;
+                break;
+                case 68:
+                   jugador.direccion = 2;
+                    break;
+                case 65:
+                   jugador.direccion = 3;
+                    break;
+            }
+        });
+
+
+        addEventListener("mousemove", (event) => {
+            
+          mouseX=event.clientX
+          mouseY=event.clientY
+        
+
+        });
+
+        addEventListener("mousedown", (event) => {  
+           if(arma.disparar){
+                arma.disparar=false
+           }else{
+                arma.disparar=true
+           }
+        });
+
+
+
+        function FuncionesJuego(timestamp){
+
+            Pintar()
+            jugador.moverJugador()
+            jugador.pintarJugador()
+            arma.pintarLazer(jugador.x,jugador.y,mouseX,mouseY)
+            enemigos.forEach(function (enemigo) {
+                if(enemigo.vida>0){
+                    if(!validarChoqueConOtroEnemigo(enemigo.x,enemigo.y,enemigo.largo,enemigo.alto,enemigo.direccion,enemigo.velocidad)){
+                        enemigo.mover(jugador.x,jugador.y)
+                    }
+                    enemigo.pintar()
+                    enemigo.genNuevaDireccion()
+                    if(arma.disparar){
+                        validarChoqueLazerConEnemigo()
+        
+                    }
+                }
+             
+            });
+         
+            requestAnimationFrame(FuncionesJuego); 
+        }
+        requestAnimationFrame(FuncionesJuego);
+
+        function Pintar(){
+            ctx.fillStyle = "Black";
+            ctx.fillRect(0,0,1700,900)
+
+            ctx.font = "50px Georgia";
+            ctx.fillStyle = "White";
+            ctx.fillText("VIDA : "+jugador.vida, 500, 50);
+
+            ctx.font = "50px Georgia";
+            ctx.fillStyle = "red";
+            ctx.fillText("KILLS : "+jugador.puntos, 1000, 50);
+
+
+            particulasRestosEnemigos.forEach(function (particula) {
+                if(!particula.disponibe){
+                   particula.moverParticula()
+                    ctx.fillStyle = "green";
+                    ctx.fillRect(particula.x,particula.y,particula.largo,particula.alto)
+                }
+             
+            });
+
+
+            particulasEscenarioFondo.forEach(function (particula) {
+               
+                particula.moverParticula()
+                ctx.fillStyle = "#36ffce";
+                ctx.fillRect(particula.x,particula.y,particula.largo,particula.alto)    
+             
+            });
+        }
+
+       
+
+
+        
+        function validarChoqueLazerConEnemigo(){
+            enemigos.forEach(function (enemigo){
+                if(enemigo.vida>0){
+                    if(mouseX>=enemigo.x && mouseX<enemigo.x+enemigo.largo && mouseY>=enemigo.y && mouseY<=enemigo.y+enemigo.alto){
+                      enemigo.vida-=arma.dano
+                      if(enemigo.vida<=0){
+                        genParticulasRestosEnemigos(enemigo.x,enemigo.y)
+                        enemigo.vida=5
+                        enemigo.x=genRandom(1650)
+                        enemigo.y=genRandom(850)
+                        jugador.puntos++
+                      }
+                    }
+                }
+            })
+        }
+
+        function genParticulasRestosEnemigos(enemigoX,enemigoY){
+            particulasRestosEnemigos.forEach(function(particula){
+                particula.generar(enemigoX,enemigoY)
+            })
+        }
+
+        function validarChoqueConOtroEnemigo(enemigoX,enemigoY,enemigoLargo,enemigoAlto,enemigoDireccion,enemigoVelocidad){
+            var choqueEnemigo=false
+
+            enemigos.forEach(function (enemigo){
+                if(enemigo.vida>0){
+
+                     //derecha arriba
+                    if(enemigoX<jugador.x && enemigoY>jugador.y ){
+                        if(enemigoX+enemigoLargo+enemigoVelocidad>enemigo.x && enemigoX+enemigoLargo+enemigoVelocidad<enemigo.x+enemigo.largo && enemigoY-enemigoVelocidad>enemigo.y && enemigoY-enemigoVelocidad<enemigo.y+enemigo.alto){
+                            choqueEnemigo=true
+                        }
+                    }
+
+                    //izquierda arriba
+                    if(enemigoX>jugador.x && enemigoX>jugador.y){
+                        if(enemigoX-enemigoVelocidad>enemigo.x && enemigoX-enemigoVelocidad<enemigo.x+enemigo.largo && enemigoY-enemigoVelocidad>enemigo.y && enemigoY-enemigoVelocidad<enemigo.y+enemigo.alto){
+                            choqueEnemigo=true
+                        }               
+                    }
+
+                    //derecha abajo
+                    if(enemigoX<jugador.x && enemigoY<jugador.y){
+                        if(enemigoX+enemigoVelocidad+enemigoLargo>enemigo.x && enemigoX+enemigoLargo+enemigoVelocidad<enemigo.x+enemigo.largo && enemigoY+enemigoAlto+enemigoVelocidad>enemigo.y && enemigoY+enemigoAlto+enemigoVelocidad<enemigo.y+enemigo.alto){
+                            choqueEnemigo=true
+                        }                   
+                    }
+
+                    //izquierda abajo
+                    if(enemigoX>jugador.x && enemigoY<jugador.y){
+                        if(enemigoX-enemigoVelocidad>enemigo.x && enemigoX-enemigoVelocidad<enemigo.x+enemigo.largo && enemigoY+enemigoAlto+enemigoVelocidad>enemigo.y && enemigoY+enemigoAlto+enemigoVelocidad<enemigo.y+enemigo.alto){
+                            choqueEnemigo=true
+                        }              
+                    }
+                 
+
+                }        
+            })
+            return choqueEnemigo
+        }
+    </script>
+</body>
+</html>
