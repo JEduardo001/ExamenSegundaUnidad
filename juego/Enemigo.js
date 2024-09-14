@@ -1,10 +1,6 @@
 
-
-
-
-
-
-
+var posicionGeneracion
+var poscicionX
 class Enemigo {
     myCanvas = document.getElementById("myCanvas");
     ctx = myCanvas.getContext("2d");
@@ -86,18 +82,57 @@ class Enemigo {
             break;
            }*/
     }
-    genNuevaDireccion(){
+   /* genNuevaDireccion(){
         var num = Math.floor(Math.random()*10)
         if(num==0){
             this.direccion=Math.floor(Math.random()*5)
         }
-    }
+    }*/
     pintar(){
         ctx.fillStyle = "White";
         ctx.fillRect(this.x,this.y,this.largo,this.alto)
        
     }
-   
+    validarChoqueConJugador(j){
+        if(this.x+this.largo/2>=j.x && this.x+this.largo/2<=j.x+j.largo && this.y+this.alto/2>=j.y && this.y+this.alto/2<=j.y+j.alto){
+            if(j.escudo.activo && j.escudo.vida>0){
+                if(j.escudo.vida-1>=0){
+                    j.escudo.vida--        
+                }
+                
+            }else{
+                if(j.vida-1>=0){
+                    j.vida--
+                }
+            }
+           
+        }
+
+    }
+    generarNuevo(){
+        console.log("sdasdasdas")
+        switch (genRandom(3)){
+            case 0:
+                this.x = genRandom(1700)
+                this.y = -50
+            break;
+            case 1:
+                this.x = 1750
+                this.y = genRandom(900)
+
+            break;
+            case 2:
+                this.x = -50
+                this.y = genRandom(900)
+
+
+            break;
+        }
+        this.vida=5
+        
+        
+
+    }
 }
 
 

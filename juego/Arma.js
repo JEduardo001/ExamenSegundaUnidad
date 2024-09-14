@@ -4,6 +4,10 @@
 particulasLazer = [];
 var largo=20;
 var alto=20;
+var color1=255;
+var color2=255;
+var color3;
+var subirColor1=false
 
 for (let i = 0; i <5; i++) {
     particulasLazer[i] = [];  
@@ -16,9 +20,7 @@ class Arma {
     myCanvas = document.getElementById("myCanvas");
     ctx = myCanvas.getContext("2d");
 
-
     constructor(x,y,largo,alto,dano,disparar) {
-
         this.x = x
         this.y = y
         this.largo = largo
@@ -36,15 +38,30 @@ class Arma {
        if(arma.disparar){
         ctx.beginPath();
         ctx.lineWidth = 5
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = "rgb("+color1+", "+color2+", 0,100)";
         ctx.moveTo(mouseX,mouseY);
         ctx.lineTo(jugadorX, jugadorY);
         ctx.stroke();
-
-       // moverParticulasLazer(mouseX,mouseY)
-
+        
+        if(subirColor1){
+            color1++
+            if(color1>=255){
+                subirColor1=false
+            }else{
+                color2=Math.floor(Math.random()*200+50)
+            }
+        }else{
+            color1--
+            if(color1-1<50){
+                subirColor1=true
+            }else{
+                color2=Math.floor(Math.random()*200+50)
+            }
+        }
+       
+        moverParticulasLazer(mouseX,mouseY)
     
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "rgb("+color1+", "+color2+", 0,100)";
         ctx.fillRect(mouseX-20,mouseY-20,largo,alto)
         largo-=5;
         alto-=5;
@@ -59,7 +76,7 @@ class Arma {
 
 
 
-/*function moverParticulasLazer(mouseX,mouseY){
+function moverParticulasLazer(mouseX,mouseY){
     //x,y,l,a,direccion,disponibilidad,distancia
    for(var f=0;f<5;f++){
     if(particulasLazer[f][5]){
@@ -107,7 +124,7 @@ class Arma {
 
     }
    }
-}*/
+}
 
 window.Arma = Arma;
   
