@@ -59,10 +59,10 @@
         #ventanaControles{
             display: none;
             position: absolute;
-            top: 350px;
+            top: 300px;
             left: 750px;
             width: 20%;
-            height: 50%;
+            height: 55%;
             background-color: rgba(170, 34, 34, 0.488);
             flex-direction: column;
             justify-content: center;
@@ -84,14 +84,14 @@
             border-radius: 5px;
         }
         #listaControles {          
-            color: aliceblue;/* Ajusta la distancia entre los elementos de la lista */
+            color: aliceblue;
             position:absolute;
             top: 130px;
             left: 30px;
-            list-style-type: none; /* Quita los puntos de la lista */
-            padding: 0; /* Elimina el padding por defecto */
-            margin: 0; /* Elimina el margin por defecto */
-            font-size: 1.5em; /* Ajusta el tamaño del texto de los elementos de la lista */
+            list-style-type: none; 
+            padding: 0;
+            margin: 0; 
+            font-size: 1.5em; 
         }
        
 
@@ -101,6 +101,15 @@
             top: 50px;
             left: 30px; 
             font-size: 2em;
+            color: aliceblue;
+
+        }
+        #ventanaControles #txtPausa {     
+            color: aliceblue;
+            position:absolute;
+            top: 450px;
+            left: 30px; 
+            font-size: 1.5em;
             color: aliceblue;
 
         }
@@ -199,6 +208,8 @@
         <p id="txtControlLazer">Lazer: Click izquierdo</p>
         <p id="txtEscudo">Controles de Escudo</p>
         <p id="txtControlEscudo">Tecla: espacio para activar/desactivar</p>
+        <p id="txtPausa">Tecla: ESC para pausa</p>
+
 
     </div>
 
@@ -208,25 +219,46 @@
         <p>Usa tu rayo de luz para desintegrarlos, usa tu escudo para protegerte cuando más lo necesites, no lo malgastes. </p>
     </div>
     
+
+    <script src="Rayo.js"></script>
+
     <script type="text/javascript">
         const myCanvas = document.getElementById("myCanvas");
         const ctx = myCanvas.getContext("2d");
+        var rayos = [];
 
-
-        
+        window.onload = iniciar;
+        window.onresize = iniciar;
+        console.log(myCanvas.width)
+        console.log(myCanvas.height)
 
 
         function iniciar() {
             myCanvas.width = window.innerWidth - 50;
             myCanvas.height = window.innerHeight - 50;
+            genRayos()
+        }
 
-            ctx.font = "100px Georgia";
-            ctx.fillStyle = "red";
-            ctx.clearRect(0, 0, myCanvas.width, myCanvas.height); 
-            ctx.fillText("A S Y L U M", myCanvas.width/2-250, myCanvas.height/2-200);
-            
-        
-        
+        function genRayos(){
+            //cargar rayos
+            for(var it=0;it<2;it++){
+                rayos[it] = []
+                rayos[it][0] = new Rayo(
+                    genNumRandom(myCanvas.width),-10,
+                    genNumRandom(myCanvas.width),genNumRandom(myCanvas.height),
+                    5,true
+                )
+                rayos[it][1] = new Rayo(
+                    rayos[it][0].finX,rayos[it][0].finY,
+                    genNumRandom(myCanvas.width),genNumRandom(myCanvas.height),
+                    5,true
+                )
+                rayos[it][2] = new Rayo(
+                    rayos[it][1].finX,rayos[it][1].finY,
+                    genNumRandom(myCanvas.width),genNumRandom(myCanvas.height),
+                    5,true
+                )
+            }  
         }
         function ventanaControles(){
             document.getElementById('ventanaMenu').style.display = 'none';
@@ -254,8 +286,62 @@
             window.location.href = 'juego.html';
         }
 
-        window.onload = iniciar;
-        window.onresize = iniciar;
+        function Rayos(timestamp){
+
+            ctx.fillStyle = "Black";
+            ctx.fillRect(0,0,myCanvas.width,myCanvas.height)
+
+            ctx.font = "100px Georgia";
+            ctx.fillStyle = "red";
+            ctx.clearRect(0, 0, myCanvas.width, myCanvas.height); 
+            ctx.fillText("A S Y L U M", myCanvas.width/2-250, myCanvas.height/2-200);
+    
+             reinicarRayo()
+            
+            for(var it=0;it<rayos.length;it++){
+                for(var it2=0;it2<rayos[it].length;it2++){
+                    if(rayos[it][0].activo){
+                        ctx.beginPath();
+                        ctx.lineWidth = rayos[it][it2].grosor
+                        ctx.strokeStyle = "White";
+                        ctx.moveTo(rayos[it][it2].inicioX,rayos[it][it2].inicioY);
+                        ctx.lineTo(rayos[it][it2].finX,rayos[it][it2].finY);
+                        ctx.stroke();
+                    }
+                }      
+            }
+            requestAnimationFrame(Rayos); 
+        }
+        requestAnimationFrame(Rayos);
+
+        function  genNumRandom(rango){
+            return Math.floor(Math.random()*rango)
+        }
+
+        function reinicarRayo(){
+            for(var it=0;it<rayos.length;it++){
+               
+                if(!rayos[it][0].activo){
+                    rayos[it][0].inicioX = genNumRandom(myCanvas.width);
+                    rayos[it][0].inicioY =  -10;
+                    rayos[it][0].finX = genNumRandom(myCanvas.width);
+                    rayos[it][0].finY =  genNumRandom(myCanvas.height);
+                    rayos[it][0].activo =  true;
+
+
+                    rayos[it][1].inicioX = rayos[it][0].finX;
+                    rayos[it][1].inicioY =  rayos[it][0].finY;
+                    rayos[it][1].finX = genNumRandom(myCanvas.width);
+                    rayos[it][1].finY =  myCanvas.height*0.50;
+
+                    rayos[it][2].inicioX = rayos[it][1].finX;
+                    rayos[it][2].inicioY =  rayos[it][1].finY;
+                    rayos[it][2].finX = genNumRandom(myCanvas.width);
+                    rayos[it][2].finY =  myCanvas.height;
+
+                }    
+            }
+        } 
     </script>
 </body>
 </html>
