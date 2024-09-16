@@ -1,6 +1,9 @@
+var img = new Image();
+img.src = 'esfera.jpg';  
 class Player {
     myCanvas = document.getElementById("myCanvas");
     ctx = myCanvas.getContext("2d");
+   
 
     constructor(x,y,largo,alto,vida,direccion,velocidad,puntos,escudo) {
         this.x = x
@@ -18,7 +21,7 @@ class Player {
    
     pintarJugador(){
         ctx.fillStyle = "yellow";
-        ctx.fillRect(jugador.x,jugador.y,jugador.largo,jugador.alto)
+        ctx.drawImage(img,jugador.x,jugador.y,jugador.largo,jugador.alto)
        
     }
     moverJugador(){

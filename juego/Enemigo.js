@@ -1,6 +1,9 @@
 
 var posicionGeneracion
 var poscicionX
+var imgEnemigo = new Image();
+imgEnemigo.src = 'Enemigo.png';  
+
 class Enemigo {
     myCanvas = document.getElementById("myCanvas");
     ctx = myCanvas.getContext("2d");
@@ -90,7 +93,7 @@ class Enemigo {
     }*/
     pintar(){
         ctx.fillStyle = "White";
-        ctx.fillRect(this.x,this.y,this.largo,this.alto)
+        ctx.drawImage(imgEnemigo,this.x,this.y,this.largo,this.alto)
        
     }
     validarChoqueConJugador(j){
@@ -98,19 +101,15 @@ class Enemigo {
             if(j.escudo.activo && j.escudo.vida>0){
                 if(j.escudo.vida-1>=0){
                     j.escudo.vida--        
-                }
-                
+                } 
             }else{
                 if(j.vida-1>=0){
                     j.vida--
                 }
-            }
-           
+            }  
         }
-
     }
     generarNuevo(){
-        console.log("sdasdasdas")
         switch (genRandom(3)){
             case 0:
                 this.x = genRandom(1700)
@@ -119,19 +118,13 @@ class Enemigo {
             case 1:
                 this.x = 1750
                 this.y = genRandom(900)
-
             break;
             case 2:
                 this.x = -50
                 this.y = genRandom(900)
-
-
             break;
         }
         this.vida=5
-        
-        
-
     }
 }
 

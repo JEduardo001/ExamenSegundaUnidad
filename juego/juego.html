@@ -23,7 +23,7 @@
             display: none;
             position: absolute;
             top: 100px;
-            left: 500px;
+            left: 300px;
             width: 50%;
             height: 50%;
             background-color: rgba(139, 23, 23, 0.488);
@@ -40,7 +40,7 @@
             margin: 0;
           }
           #ventanaGameOver p {
-            font-size: 2em;
+            font-size: 3em;
             color: rgba(255, 255, 255, 0.8);
 
           }
@@ -53,6 +53,49 @@
             cursor: pointer;
             border-radius: 5px;
           }
+
+
+        #ventanaPausa{
+            display: none;
+            position: absolute;
+            top: 100px;
+            left: 300px;
+            width: 50%;
+            height: 50%;
+            background-color: rgba(139, 23, 23, 0.488);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 50px;
+        }
+        #ventanaPausa h1{
+            font-size: 4em;
+            color:aliceblue;
+
+        }
+        #pausa-btn {
+            padding: 10px 20px;
+            font-size: 1.5em;
+            color: white;
+            background-color: red;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #irMenu-btn {
+            margin-top: 50px;
+            padding: 10px 20px;
+            font-size: 1.5em;
+            color: white;
+            background-color: red;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+       
+
     </style>
 </head>
 <body>
@@ -62,9 +105,22 @@
 
     <div id="ventanaGameOver">
         <h1>Game Over</h1>
+        <p>KILLS:  </p>
+        <p id="txtKills">fndsifsdoifh</p>
         <p>De nuevo?</p>
         <button id="restart-btn" onclick="reiniciar()">Reinicar</button>
     </div>
+
+    <div id="ventanaPausa">
+        <h1>PAUSA</h1>
+        <p></p>
+        <button id="pausa-btn" onclick="quitarPausa()">Continuar</button>
+        <button id="irMenu-btn" onclick="irMenu()">Menu</button>
+
+    </div>
+    <audio id="sonidoLazer" src="sonidoLazer.wav"></audio>
+    <audio id="sonidoMuerteEnemigo" src="muerteEnemigo.wav"></audio>
+    <img id="enemigo1" src="enemigo1.gif" alt="GIF animado",style="display:none;">
 
 
     <script src="Player.js"></script>
@@ -81,33 +137,39 @@
     <script type="text/javascript">
         const myCanvas = document.getElementById("myCanvas");
         const ctx = myCanvas.getContext("2d");
+        const gifEnemigo1 = document.getElementById('enemigo1');
 
 
          // Crear un nuevo objeto Image para cargar el GIF
-        /* var gif = new Image();
+         var gif = new Image();
          gif.src = "videoplayback.gif"; // URL del GIF
  
          // Dibujar el GIF en el canvas una vez que se carga
          gif.onload = function() {
             console.log("cargado")
-             ctx.drawImage(gif, 50, 50, 200, 200); // Dibuja el GIF en (50, 50) y con tamaño 200x200
-         };*/
+            ctx.drawImage(gif, 100, 100, 200, 200); 
+
+         };
+        let sonidoLazer = document.getElementById("sonidoLazer");
+        let sonidoMuerteEnemigo = document.getElementById("sonidoMuerteEnemigo");
+
         var escudo = new Escudo(0,0,80,80,150,false)
-        var jugador = new Player(1700/2,900/2,50,50,20,7,15,0,escudo);  
+        var jugador = new Player(1700/2,900/2,70,70,20,7,15,0,escudo);  
         var arma = new Arma(0,0,10,10,3,false); 
         var enemigos = [];
         var particulasRestosEnemigos = [];
         var particulasEscenarioFondo = [];
         var mouseX 
         var mouseY 
-
-        
-       
+        var pausa = false
 
        
+
 
         function showGameOver() {
             document.getElementById('ventanaGameOver').style.display = 'flex';
+            document.getElementById('txtKills').innerHTML=`${jugador.puntos}`;
+
         }
           
         function reiniciar() {
@@ -121,14 +183,21 @@
           enemigos.forEach(function (enemigo) {
             enemigo.generarNuevo()
           })
-         
+        }
+
+        function quitarPausa(){
+            document.getElementById('ventanaPausa').style.display = 'none';
+            pausa=false
 
 
+        }
+        function irMenu(){
+            window.location.href = 'menu.html';
         }
         cargarVariables()
         function cargarVariables(){
             for (let i = 0; i <20; i++) {
-                enemigos[i] = new Enemigo(0,genRandom(850),30,30,7,1,10,0);  
+                enemigos[i] = new Enemigo(0,genRandom(850),50,50,7,1,10,0);  
                 particulasRestosEnemigos[i] = new Particulas(0,0,10,10,10,0,true,0);  
 
             }
@@ -145,11 +214,36 @@
         function genRandom(alcanze){
             return Math.floor(Math.random()*alcanze);
         }
+        
+        function iniciarSonidoLazer() {
+            sonidoLazer.play();
+          
+            sonidoLazer.addEventListener("ended", function() {
+                sonidoLazer.currentTime = 0; 
+                sonidoLazer.play();           
+            });
+        }
+
+        function pararSonidoLazer() {
+            sonidoLazer.pause();
+            sonidoLazer.currentTime = 0;
+        }
+
+        function iniciarSonidoMuerteEnemigo() {
+           
+            sonidoMuerteEnemigo.play();
+        }
+
        
+
         addEventListener("keydown", (event) => {
           
-
             switch(event.keyCode) {
+                case 27:
+                  document.getElementById('ventanaPausa').style.display = 'flex';
+                  pausa=true
+
+                break;
                 case 32:
                     if(jugador.escudo.activo){
                         jugador.escudo.activo=false
@@ -181,11 +275,14 @@
 
         });
 
-        addEventListener("mousedown", (event) => {  
+        addEventListener("mousedown", (event) => { 
            if(arma.disparar){
                 arma.disparar=false
+                pararSonidoLazer()
            }else{
                 arma.disparar=true
+                iniciarSonidoLazer() 
+
            }
         });
 
@@ -193,31 +290,37 @@
 
         function FuncionesJuego(timestamp){
 
-            Pintar()
-            jugador.moverJugador()
-            jugador.pintarJugador()
-            arma.pintarLazer(jugador.x,jugador.y,mouseX,mouseY)
-         
-            enemigos.forEach(function (enemigo) {
-                if(enemigo.vida>0){
-                    if(!validarChoqueConOtroEnemigo(enemigo.x,enemigo.y,enemigo.largo,enemigo.alto,enemigo.direccion,enemigo.velocidad)){
-                        enemigo.mover(jugador.x,jugador.y)  
+            
+            if(!pausa){
+                
+                Pintar()
+                jugador.moverJugador()
+                jugador.pintarJugador()
+                arma.pintarLazer(jugador.x,jugador.y,mouseX,mouseY)
+            
+                enemigos.forEach(function (enemigo) {
+                    if(enemigo.vida>0){
+                        if(!validarChoqueConOtroEnemigo(enemigo.x,enemigo.y,enemigo.largo,enemigo.alto,enemigo.direccion,enemigo.velocidad)){
+                            enemigo.mover(jugador.x,jugador.y)  
+                        }
+                        enemigo.validarChoqueConJugador(jugador)
+                        enemigo.pintar()
+                    // enemigo.genNuevaDireccion()
+                        if(arma.disparar && jugador.vida>0){
+                            validarChoqueLazerConEnemigo()
+            
+                        }
                     }
-                    enemigo.validarChoqueConJugador(jugador)
-                    enemigo.pintar()
-                   // enemigo.genNuevaDireccion()
-                    if(arma.disparar && jugador.vida>0){
-                        validarChoqueLazerConEnemigo()
-        
-                    }
+                
+                });
+                if(jugador.vida<=0){
+                    showGameOver()
                 }
-             
-            });
-            if(jugador.vida<=0){
-                showGameOver()
+            
             }
-         
             requestAnimationFrame(FuncionesJuego); 
+
+
         }
         requestAnimationFrame(FuncionesJuego);
 
@@ -245,7 +348,7 @@
             particulasRestosEnemigos.forEach(function (particula) {
                 if(!particula.disponibe){
                    particula.moverParticula()
-                    ctx.fillStyle = "green";
+                    ctx.fillStyle = "#02f9f2";
                     ctx.fillRect(particula.x,particula.y,particula.largo,particula.alto)
                 }
              
@@ -274,6 +377,7 @@
                         genParticulasRestosEnemigos(enemigo.x,enemigo.y)
                         enemigo.generarNuevo()
                         jugador.puntos++
+                        iniciarSonidoMuerteEnemigo()
                       }
                     }
                 }
