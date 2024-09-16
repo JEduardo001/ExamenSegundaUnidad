@@ -100,7 +100,6 @@
 </head>
 <body>
     <canvas id="myCanvas" width="1700" height="900" style="border:1px solid grey"></canvas>
-    <img id="gif" src="videoplsayback.gif" alt="GIF"  >
 
 
     <div id="ventanaGameOver">
@@ -120,7 +119,6 @@
     </div>
     <audio id="sonidoLazer" src="sonidoLazer.wav"></audio>
     <audio id="sonidoMuerteEnemigo" src="muerteEnemigo.wav"></audio>
-    <img id="enemigo1" src="enemigo1.gif" alt="GIF animado",style="display:none;">
 
 
     <script src="Player.js"></script>
@@ -138,20 +136,12 @@
         const myCanvas = document.getElementById("myCanvas");
         const ctx = myCanvas.getContext("2d");
         const gifEnemigo1 = document.getElementById('enemigo1');
-
-
-         // Crear un nuevo objeto Image para cargar el GIF
-         var gif = new Image();
-         gif.src = "videoplayback.gif"; // URL del GIF
- 
-         // Dibujar el GIF en el canvas una vez que se carga
-         gif.onload = function() {
-            console.log("cargado")
-            ctx.drawImage(gif, 100, 100, 200, 200); 
-
-         };
+        
+     
         let sonidoLazer = document.getElementById("sonidoLazer");
         let sonidoMuerteEnemigo = document.getElementById("sonidoMuerteEnemigo");
+
+        
 
         var escudo = new Escudo(0,0,80,80,150,false)
         var jugador = new Player(1700/2,900/2,70,70,20,7,15,0,escudo);  
@@ -164,7 +154,6 @@
         var pausa = false
 
        
-
 
         function showGameOver() {
             document.getElementById('ventanaGameOver').style.display = 'flex';
@@ -188,8 +177,6 @@
         function quitarPausa(){
             document.getElementById('ventanaPausa').style.display = 'none';
             pausa=false
-
-
         }
         function irMenu(){
             window.location.href = 'menu.html';
@@ -237,6 +224,8 @@
        
 
         addEventListener("keydown", (event) => {
+
+            playNextSong()
           
             switch(event.keyCode) {
                 case 27:
@@ -268,7 +257,6 @@
 
 
         addEventListener("mousemove", (event) => {
-            
           mouseX=event.clientX
           mouseY=event.clientY
         
@@ -428,6 +416,29 @@
                 }        
             })
             return choqueEnemigo
+        }
+
+
+
+        const song1 = new Audio('cancion1.mp3');
+        const song2 = new Audio('cancion2.mp3');
+
+        const playlist = [song1, song2];
+        let itSong = 0;
+
+        function playNextSong() {
+            if (itSong < playlist.length) {
+                playlist[itSong].play();
+
+                playlist[itSong].addEventListener('ended', function() {
+                    itSong++;
+                    playNextSong(); 
+                });
+            }else{
+                itSong=0
+                playNextSong(); 
+
+            }
         }
     </script>
 </body>

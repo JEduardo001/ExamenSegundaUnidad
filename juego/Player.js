@@ -59,12 +59,7 @@ class Player {
     
             break;
            }
-
-
         }
-        
-
-     
     }
 }
   

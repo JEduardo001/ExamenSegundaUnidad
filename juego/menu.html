@@ -233,13 +233,12 @@
 
         window.onload = iniciar;
         window.onresize = iniciar;
-        console.log(myCanvas.width)
-        console.log(myCanvas.height)
 
 
         function iniciar() {
             myCanvas.width = window.innerWidth - 50;
             myCanvas.height = window.innerHeight - 50;
+            
             genRayos()
         }
 
@@ -265,6 +264,7 @@
             }  
         }
         function ventanaControles(){
+            playNextSong()
             document.getElementById('ventanaMenu').style.display = 'none';
             document.getElementById('ventanaControles').style.display = 'flex';
 
@@ -277,6 +277,7 @@
 
         }
         function ventanaDescripcion(){
+            playNextSong()
             document.getElementById('ventanaMenu').style.display = 'none';
             document.getElementById('ventanaDescripcion').style.display = 'flex';
 
@@ -366,45 +367,16 @@
                 }    
             }
         } 
-    </script>
-</body>
-</html>
- =  myCanvas.height*0.50;
 
-                    rayos[it][2].inicioX = rayos[it][1].finX;
-                    rayos[it][2].inicioY =  rayos[it][1].finY;
-                    rayos[it][2].finX = genNumRandom(myCanvas.width);
-                    rayos[it][2].finY =  myCanvas.height;
 
-                }    
-            }
-        } 
-    </script>
-</body>
-</html>
- =  myCanvas.height*0.50;
+        const song1 = new Audio('cancionMenu.mp3');
 
-                    rayos[it][2].inicioX = rayos[it][1].finX;
-                    rayos[it][2].inicioY =  rayos[it][1].finY;
-                    rayos[it][2].finX = genNumRandom(myCanvas.width);
-                    rayos[it][2].finY =  myCanvas.height;
-
-                }    
-            }
-        } 
-    </script>
-</body>
-</html>
- =  myCanvas.height*0.50;
-
-                    rayos[it][2].inicioX = rayos[it][1].finX;
-                    rayos[it][2].inicioY =  rayos[it][1].finY;
-                    rayos[it][2].finX = genNumRandom(myCanvas.width);
-                    rayos[it][2].finY =  myCanvas.height;
-
-                }    
-            }
-        } 
+        function playNextSong() {
+                song1.play()
+                song1.addEventListener('ended', function() {
+                    playNextSong(); 
+                });   
+        }
     </script>
 </body>
 </html>

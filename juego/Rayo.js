@@ -9,7 +9,7 @@ class Rayo {
        this.activo = activo
        setInterval(() => {
         this.desactivarRayo();
-        }, Math.floor(Math.random()*3000));
+        }, Math.floor(Math.random()*3000)+3000);
     }
 
 
